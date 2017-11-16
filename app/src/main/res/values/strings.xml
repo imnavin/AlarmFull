@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">AlarmFull</string>
+
+    <string-array name="alarms_array">
+        <item>apple</item>
+        <item>coolest</item>
+        <item>nokia</item>
+        <item>nokiatwo</item>
+        <item>sweetalarm</item>
+    </string-array>
+
+    <string name="title_activity_maps">Map</string>
+
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyAw_r_WPuhoAIZGmaugq6dpmytovopBRY0
+    </string>
+
 </resources>
