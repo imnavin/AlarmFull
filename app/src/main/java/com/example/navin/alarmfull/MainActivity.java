@@ -20,6 +20,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.navin.alarmfull.mapscomp.GetDirectionsData;
 import com.example.navin.alarmfull.mapscomp.GetNearbyPlacesData;
 import com.example.navin.alarmfull.weathercomp.data.JSONWeatherParser;
 import com.example.navin.alarmfull.weathercomp.data.WeatherHttpClient;
@@ -114,17 +115,24 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 if (!(hour == 0 && minute == 0 && dest == null)) {
 
+                    Log.d("Got through 1:","YAYY");
+
                     OtherMethods otherMethods = new OtherMethods();
 
+                    /*//COMMENTED - fixing duration and dest
                     Location locationA = new Location("Point A");
-                    Location locationB = new Location("Point B");
+                    Location locationB = new Location("Point B");*/
 
-                    myLat = 6.9126927;
-                    myLng = 79.8484904;
+                    //Have to get our location
+                    myLat = 6.837140;
+                    myLng = 79.929397;
 
                     destLat = dest.latitude;
                     destLng = dest.longitude;
 
+                    Log.d("Got through 2:","YAYY");
+
+                    /*//COMMENTED - fixing duration and dest
                     locationA.setLatitude(myLat);
                     locationA.setLongitude(myLng);
 
@@ -133,13 +141,30 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     float distanceA_B = locationA.distanceTo(locationB);
 
-                    int distA_B = (int) distanceA_B;
+                    int distA_B = (int) distanceA_B;*/
 
-                    Log.i("Distance is ", Integer.toString(distA_B));
+                    int distA_B = distanceFromAtoB(myLat,myLng,destLat,destLng);
+                    int[] durr = otherMethods.extractDuration(GetDirectionsData.durationToDest);
+
+                    Log.d("Got through 3:","YAYY");
+
+                    if(durr.length == 1){
+                        durationMins = durr[0];
+                    }
+                    else if (durr.length == 2){
+                        durationHours = durr[0];
+                        durationMins = durr[1];
+                    }
+                    else {
+                        Log.e("ERROR:ArrayDuration","CLASS:MainActivity(SetAlarm)");
+                    }
+
+                    Log.i("Distance is ", Integer.toString(distA_B)+"Km");
                     //String duration = otherMethods.extractDuration(GetDirectionsData.duration);
-                    String duration="25";
-                    String[] parts = duration.split(" ");
+//                    String duration="25";
+//                    String[] parts = duration.split(" "); COMMENTED - fixing duration and dest
 
+                    /*//COMMENTED - fixing duration and dest
                     if (parts.length == 1)
                     {
                         String timeMinutes = parts[0];
@@ -155,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                     else {
                         Log.e("ERROR Duration ", "WRONG array");
-                    }
+                    }*/
 
                     parsedata = extractCity(destAddress) + ",LK";
                     renderWeatherData(parsedata);
@@ -176,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     //weatherCondition=false;
                     if (weatherCondition) {
                         Log.i("Weather data PASS : ",Boolean.toString(weatherCondition));
-                        distA_B = distA_B * 5;
+                        distA_B = distA_B * 2;
                         minute = minute - distA_B;
                         if (minute < 0) {
                             minute = 60 + minute;
@@ -221,9 +246,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 else{
                     //Alert the user to enter the time or the Destination
                     Log.e("FAIL","Alarm set FAIL");
-                    Log.i("FAILED",Integer.toString(hour));
-                    Log.i("FAILED",Integer.toString(minute));
-                    Log.i("FAILED",dest.toString());
+                    Log.e("FAILED",Integer.toString(hour));
+                    Log.e("FAILED",Integer.toString(minute));
+                    Log.e("FAILED",dest.toString());
                 }
             }
         });
@@ -290,24 +315,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         return nearestTrainLatLng;
     }
 
-//    public int distanceFromAtoB(double A_lat, double A_lng, double B_lat, double B_lng){
-//
-//        OtherMethods otherMethods = new OtherMethods();
-//        Object dataTransfer[] = new Object[3];
-//        String distanceUrl = otherMethods.getDirectionUrl(A_lat, A_lng, B_lat, B_lng);
-//        //GetDirectionsData getDirectionsData = new GetDirectionsData();
-//
-//        dataTransfer[0] = mMap;
-//        dataTransfer[1] = distanceUrl;
-//        dataTransfer[2] = new LatLng(B_lat,B_lng);
-//
-//       // getDirectionsData.execute(dataTransfer); // EXTRACT
-//
-//       // distance = otherMethods.extractDistance(GetDirectionsData.distance);
-//
-//        return distance;
-//
-//    }
+    public int distanceFromAtoB(double A_lat, double A_lng, double B_lat, double B_lng){
+
+        OtherMethods otherMethods = new OtherMethods();
+        Object dataTransfer[] = new Object[3];
+        String distanceUrl = otherMethods.getDirectionUrl(A_lat, A_lng, B_lat, B_lng);
+        GetDirectionsData getDirectionsData = new GetDirectionsData();
+
+        dataTransfer[0] = mMap;
+        dataTransfer[1] = distanceUrl;
+        dataTransfer[2] = new LatLng(B_lat,B_lng);
+
+        getDirectionsData.execute(dataTransfer); // EXTRACT
+
+        /*//COMMENT - fixing
+        distance = otherMethods.extractDistance(GetDirectionsData.distanceToDest);*/
+
+        return distance;
+
+    }
 
     public void renderWeatherData(String city){
 
@@ -396,11 +422,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             if ((badWeather.isCloudy(weatherSample)) || (badWeather.isRaining(weatherSample))){
                 weatherCondition = true;
-                Log.v("Good or Bad : true ", String.valueOf(weatherCondition));
+                Log.v("Good or Bad : BAD ", String.valueOf(weatherCondition));
             }
             else{
                 weatherCondition = false;
-                Log.v("Good or Bad : false ", String.valueOf(weatherCondition));
+                Log.v("Good or Bad : GOOD ", String.valueOf(weatherCondition));
             }
 
             Log.v("Good or Bad : ", weather.currentCondition.getDescription());

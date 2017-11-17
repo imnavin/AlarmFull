@@ -1,7 +1,9 @@
 package com.example.navin.alarmfull.mapscomp;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.example.navin.alarmfull.MainActivity;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -18,8 +20,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     GoogleMap mMap;
     String url;
     String googleDirectionsData;
-    public static String duration;
-    public static String distance;
+    public static String durationToDest="";
+    public static String distanceToDest="";
     LatLng latLng;
 
     @Override
@@ -46,17 +48,20 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         HashMap<String, String> directionsList = null;
         DataParser parser = new DataParser();
         directionsList = parser.parseDirections(s);
-        duration = directionsList.get("duration");
-        distance = directionsList.get("distance");
+        durationToDest = directionsList.get("duration");
+        distanceToDest = directionsList.get("distance");
 
-        mMap.clear();
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.draggable(true);
-        markerOptions.title("Duration = "+duration);
-        markerOptions.snippet("Distance = "+distance);
+//        mMap.clear();
+//        MarkerOptions markerOptions = new MarkerOptions();
+//        markerOptions.position(latLng);
+//        markerOptions.draggable(true);
+//        markerOptions.title("Duration = "+MainActivity.durationToDest);
+//        markerOptions.snippet("Distance = "+MainActivity.distanceToDest);
 
-        mMap.addMarker(markerOptions);
+        Log.e("Duration value:"," CLASS:GetDirectionsData"+durationToDest);
+        Log.e("Distance value:"," CLASS:GetDirectionsData"+distanceToDest);
+
+//        mMap.addMarker(markerOptions);
 
     }
 }
