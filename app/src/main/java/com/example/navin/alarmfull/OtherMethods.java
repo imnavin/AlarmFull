@@ -33,23 +33,24 @@ public class OtherMethods {
 
 
     public int extractDistance(String distance){
-        Log.d("Got through extractDis","YAYY = "+distance);
+        Log.d("OtherMethods(extrctDis)","Got through YAYY = "+distance);
 
         String[] parts = distance.split(" ");
 
         float a_b_flt = Float.parseFloat(parts[0]);
         String km = parts[1];
 
-        Log.d("Successful float:","YAYY");
+        Log.d("OtherMethods(extrctDis)","Float Successful YAYY = "+a_b_flt);
 
         int a_b = (int)a_b_flt;
 
-        Log.d("Successful convert:","YAYY");
+        Log.d("OtherMethods(extrctDis)","FLoat Convert Succes YAYY = "+a_b);
 
         return a_b;
     }
     public int[] extractDuration(String duration){
 
+        Log.d("OtherMethods(extrctDis)","YAYYY = "+duration);
         String[] parts = duration.split(" ");
         int partsSize = parts.length;
 
@@ -70,7 +71,7 @@ public class OtherMethods {
             return durHrsMins;
         }
         else{
-            Log.e("ALIEN:","Epic fail. NOT WORKING.");
+            Log.e("OtherMethods(extrctDis)","ERROR: Epic fail. NOT WORKING!");
             int[] arr = {0};
             return arr;
         }

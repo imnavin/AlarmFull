@@ -10,6 +10,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by navin on 11/15/2017.
@@ -20,8 +21,6 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
     GoogleMap mMap;
     String url;
     String googleDirectionsData;
-    public static String durationToDest="";
-    public static String distanceToDest="";
     LatLng latLng;
 
     @Override
@@ -48,8 +47,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
         HashMap<String, String> directionsList = null;
         DataParser parser = new DataParser();
         directionsList = parser.parseDirections(s);
-        durationToDest = directionsList.get("duration");
-        distanceToDest = directionsList.get("distance");
+        MainActivity.durationToDest = directionsList.get("duration");
+        MainActivity.distanceToDest = directionsList.get("distance");
 
 //        mMap.clear();
 //        MarkerOptions markerOptions = new MarkerOptions();
@@ -58,8 +57,8 @@ public class GetDirectionsData extends AsyncTask<Object, String, String> {
 //        markerOptions.title("Duration = "+MainActivity.durationToDest);
 //        markerOptions.snippet("Distance = "+MainActivity.distanceToDest);
 
-        Log.e("Duration value:"," CLASS:GetDirectionsData"+durationToDest);
-        Log.e("Distance value:"," CLASS:GetDirectionsData"+distanceToDest);
+        Log.d("GetDirectionsData:exe"," Duration value = "+MainActivity.durationToDest);
+        Log.d("GetDirectionsData:exe"," Distance value = "+MainActivity.distanceToDest);
 
 //        mMap.addMarker(markerOptions);
 

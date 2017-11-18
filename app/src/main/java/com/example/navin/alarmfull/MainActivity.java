@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     long delay = 900000;
     String timeNow;
     String destAddress;
-    String parsedata="";
+    String parsedata="Colombo,LK";
     String am_pm = "AM";
 
     int hour = 0;
@@ -71,7 +73,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     double myLat, myLng;
     double destLat, destLng;
     int durationHours=0, durationMins=0;
+    int readyDurationMins=0;
     GoogleMap mMap;
+    int distA_B;
+    int[] durr;
+    public static String durationToDest="";
+    public static String distanceToDest="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         //country=(EditText)findViewById(R.id.txt_Country);
         //city=(EditText)findViewById(R.id.txt_City);
+
 
         //WEATHER >>>>>>>>>>>>>>>>>>>>>
         renderWeatherData("Colombo,LK");
@@ -115,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                 if (!(hour == 0 && minute == 0 && dest == null)) {
 
-                    Log.d("Got through 1:","YAYY");
+                    Log.d("MainActivity:SetAlarm"," Got through 1:YAYY");
 
                     OtherMethods otherMethods = new OtherMethods();
 
@@ -130,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     destLat = dest.latitude;
                     destLng = dest.longitude;
 
-                    Log.d("Got through 2:","YAYY");
+                    Log.d("MainActivity:SetAlarm"," Got through 2:YAYY");
 
                     /*//COMMENTED - fixing duration and dest
                     locationA.setLatitude(myLat);
@@ -143,24 +151,34 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     int distA_B = (int) distanceA_B;*/
 
-                    int distA_B = distanceFromAtoB(myLat,myLng,destLat,destLng);
-                    int[] durr = otherMethods.extractDuration(GetDirectionsData.durationToDest);
+                    distanceFromAtoB(myLat,myLng,destLat,destLng);
 
-                    Log.d("Got through 3:","YAYY");
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                OtherMethods exe = new OtherMethods();
+                                                distA_B = exe.extractDistance(distanceToDest);
+                                                durr = exe.extractDuration(durationToDest);
 
-                    if(durr.length == 1){
-                        durationMins = durr[0];
-                    }
-                    else if (durr.length == 2){
-                        durationHours = durr[0];
-                        durationMins = durr[1];
-                    }
-                    else {
-                        Log.e("ERROR:ArrayDuration","CLASS:MainActivity(SetAlarm)");
-                    }
+                                                Log.d("MainActivity:SetAlarm","Distance = "+distanceToDest);
+                                                Log.d("MainActivity:SetAlarm","Duration = "+durationToDest);
 
-                    Log.i("Distance is ", Integer.toString(distA_B)+"Km");
-                    //String duration = otherMethods.extractDuration(GetDirectionsData.duration);
+                                                Log.d("MainActivity:SetAlarm","Got through 3:YAYY");
+
+                                                if(durr.length == 1){
+                                                    durationMins = durr[0];
+                                                }
+                                                else if (durr.length == 2){
+                                                    durationHours = durr[0];
+                                                    durationMins = durr[1];
+                                                }
+                                                else {
+                                                    Log.e("MainActivity:SetAlarm","ERROR: Array durr = "+ Arrays.toString(durr));
+                                                }
+
+                                                Log.d("MainActivity:SetAlarm", "Distance is = "+Integer.toString(distA_B));
+                                                //String duration = otherMethods.extractDuration(GetDirectionsData.duration);
 //                    String duration="25";
 //                    String[] parts = duration.split(" "); COMMENTED - fixing duration and dest
 
@@ -182,73 +200,78 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         Log.e("ERROR Duration ", "WRONG array");
                     }*/
 
-                    parsedata = extractCity(destAddress) + ",LK";
-                    renderWeatherData(parsedata);
+                                                renderWeatherData(parsedata);
 
 //                int hour = alarm_time_picker.getHour();
 //                int minute = alarm_time_picker.getMinute();
 
-                    //ADD TIME
-                    hour = MyTimePicker.hoursTP;
-                    minute = MyTimePicker.minsTP;
+                                                //ADD TIME
+                                                hour = MyTimePicker.hoursTP;
+                                                minute = MyTimePicker.minsTP;
 
-                    hour = hour - durationHours;
-                    minute = minute - durationMins;
+                                                hour = hour - durationHours;
+                                                minute = minute - durationMins;
 
-                    Log.i("Hours PASS : ", Integer.toString(hour));
-                    Log.i("Mins PASS : ", Integer.toString(minute));
+                                                Log.i("MainActivity(SetAlarm)", "Hours PASS = "+Integer.toString(hour));
+                                                Log.i("MainActivity(SetAlarm)", "Mins PASS = "+Integer.toString(minute));
 
-                    //weatherCondition=false;
-                    if (weatherCondition) {
-                        Log.i("Weather data PASS : ",Boolean.toString(weatherCondition));
-                        distA_B = distA_B * 2;
-                        minute = minute - distA_B;
-                        if (minute < 0) {
-                            minute = 60 + minute;
-                            hour = hour - 1;
-                        }
-                    }
-
-
-                    calendar.set(Calendar.HOUR_OF_DAY, hour);//set calendar instance with hours and minutes on the time picker
-                    calendar.set(Calendar.MINUTE, minute);
+                                                //weatherCondition=false;
+                                                if (weatherCondition) {
+                                                    Log.i("MainActivity(SetAlarm)","Weather data PASS = "+Boolean.toString(weatherCondition));
+                                                    distA_B = distA_B * 1;
+                                                    minute = minute - distA_B;
+                                                    if (minute < 0) {
+                                                        minute = 60 + minute;
+                                                        hour = hour - 1;
+                                                    }
+                                                }
 
 
-                    String hour_string = String.valueOf(hour);
-                    String minute_string = String.valueOf(minute);
+                                                calendar.set(Calendar.HOUR_OF_DAY, hour);//set calendar instance with hours and minutes on the time picker
+                                                calendar.set(Calendar.MINUTE, minute);
 
-                    if (hour > 12) {
+                                                String hour_string = String.valueOf(hour);
+                                                String minute_string = String.valueOf(minute);
 
-                        hour_string = String.valueOf(hour - 12);
-                        am_pm = "PM";
-                    }
+                                                if (hour > 12) {
 
-                    if (minute < 10) {
+                                                    hour_string = String.valueOf(hour - 12);
+                                                    am_pm = "PM";
+                                                }
 
-                        minute_string = "0" + String.valueOf(minute);
+                                                if (minute < 10) {
 
-                    }
+                                                    minute_string = "0" + String.valueOf(minute);
 
-                    set_alarm_text(hour_string + ":" + minute_string + am_pm);//changes the text in the update text box
+                                                }
 
-                    my_intent.putExtra("extra", "alarm on");//tells the clock that the alarm on button is pressed, putting extra string to my_intent
-                    my_intent.putExtra("alarm tone", alarm_tracks);//tell the app that you want a certain value from the spinner
+                                                set_alarm_text(hour_string + ":" + minute_string + am_pm);//changes the text in the update text box
 
-                    Log.e("The alarm id is", String.valueOf(alarm_tracks));
+                                                my_intent.putExtra("extra", "alarm on");//tells the clock that the alarm on button is pressed, putting extra string to my_intent
+                                                my_intent.putExtra("alarm tone", alarm_tracks);//tell the app that you want a certain value from the spinner
 
-                    pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0,
-                            my_intent, PendingIntent.FLAG_UPDATE_CURRENT);//Create a pending intent
+                                                Log.e("The alarm id is", String.valueOf(alarm_tracks));
 
-                    alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending_intent);
+                                                pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0,
+                                                        my_intent, PendingIntent.FLAG_UPDATE_CURRENT);//Create a pending intent
+
+                                                alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending_intent);
+                                            }
+                                        },4000);
+
+//                    int distA_B = otherMethods.extractDistance(GetDirectionsData.distanceToDest);
+//                    int[] durr = otherMethods.extractDuration(durationToDest);
+
+
 
                 }
 
                 else{
                     //Alert the user to enter the time or the Destination
-                    Log.e("FAIL","Alarm set FAIL");
-                    Log.e("FAILED",Integer.toString(hour));
-                    Log.e("FAILED",Integer.toString(minute));
-                    Log.e("FAILED",dest.toString());
+                    Log.e("","Alarm set FAIL");
+                    Log.e("","FAILED hour = "+Integer.toString(hour));
+                    Log.e("","FAILED mins = "+Integer.toString(minute));
+                    Log.e("","FAILED LatLng = "+dest.toString());
                 }
             }
         });
@@ -283,11 +306,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(!(fullAddress == null)){
             String[] parts = fullAddress.split(", ");
             String extracted = parts[1];
-            Log.i("Extracted City:", extracted);
+            Log.i("MainActivity(extCity)", "Extracted City = "+extracted);
             return extracted;
         }
         else{
-            Log.i("ERROR: ", "Can't extract city cos the String provided is NULL");
+            Log.e("MainActivity(extCity)", "Can't extract city cos the String provided is NULL");
             return null;
         }
     }
@@ -300,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         String keyType = "train_station";
         String trainUrl = otherMethods.getNearbyTrainUrl(lat, lng, keyType);
 
-        Log.d("TRAIN URL", " "+trainUrl);
+        Log.d("MainAct(findStation)", "TRAIN URL = "+trainUrl);
 
         Object dataTransfer[] = new Object[2];
         dataTransfer[0] = mMap;
@@ -310,12 +333,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         getNearbyPlacesData.execute(dataTransfer);
         nearestTrainLatLng = getNearbyPlacesData.getLatLng(); // ADD CODE - GETLATLNG FROM getNearbyPlacesData
 
-        Log.d("Train LAT LNG",nearestTrainLatLng.toString());
+        Log.d("MainAct(findStation)","Train LatLng = "+nearestTrainLatLng.toString());
 
         return nearestTrainLatLng;
     }
 
-    public int distanceFromAtoB(double A_lat, double A_lng, double B_lat, double B_lng){
+    public void distanceFromAtoB(double A_lat, double A_lng, double B_lat, double B_lng){
 
         OtherMethods otherMethods = new OtherMethods();
         Object dataTransfer[] = new Object[3];
@@ -331,9 +354,26 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         /*//COMMENT - fixing
         distance = otherMethods.extractDistance(GetDirectionsData.distanceToDest);*/
 
-        return distance;
+//        return distance;
 
     }
+
+    /*public String durationFromAtoB(double A_lat, double A_lng, double B_lat, double B_lng){
+
+        OtherMethods otherMethods = new OtherMethods();
+        Object dataTransfer[] = new Object[3];
+        String distanceUrl = otherMethods.getDirectionUrl(A_lat, A_lng, B_lat, B_lng);
+        GetDirectionsData getDirectionsData = new GetDirectionsData();
+
+        dataTransfer[0] = mMap;
+        dataTransfer[1] = distanceUrl;
+        dataTransfer[2] = new LatLng(B_lat,B_lng);
+
+        getDirectionsData.execute(dataTransfer); // EXTRACT
+
+        return GetDirectionsData.durationToDest;
+
+    }*/
 
     public void renderWeatherData(String city){
 
