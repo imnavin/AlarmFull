@@ -1,7 +1,9 @@
 package com.example.navin.alarmfull.mapscomp;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.example.navin.alarmfull.MainActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -19,14 +21,14 @@ import java.util.List;
 public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
 
     String googlePlacesData;
-    //GoogleMap mMap;
+    GoogleMap mMap;
     String url;
-    double lat, lng;
-    LatLng latLng;
+    String trainClassSName, trainClassVic;
+    double trainClassLat, trainClassLng;
 
     @Override
     protected String doInBackground(Object... objects) {
-//        mMap = (GoogleMap)objects[0];
+        mMap = (GoogleMap)objects[0];
         url = (String)objects[1];
 
         DownloadUrl downloadUrl = new DownloadUrl();
@@ -43,25 +45,36 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
     protected void onPostExecute(String s) {
 
         List<HashMap<String, String>> nearbyPlaceList = null;
-        //DataParser parser = new DataParser();
-        //nearbyPlaceList = parser.parse(s);
+        DataParser parser = new DataParser();
+        nearbyPlaceList = parser.parse(s);
         showNearbyPlaces(nearbyPlaceList);
 
     }
 
     private void showNearbyPlaces(List<HashMap<String, String>> nearbyPlaceList) {
-        MarkerOptions markerOptions = new MarkerOptions();
+//        MarkerOptions markerOptions = new MarkerOptions();
         HashMap<String, String> googlePlace = nearbyPlaceList.get(0);
 
-        String placeName = googlePlace.get("place_name");
-        String vicinity = googlePlace.get("vicinity");
-        lat = Double.parseDouble(googlePlace.get("lat"));
-        lng = Double.parseDouble(googlePlace.get("lng"));
+        trainClassSName = googlePlace.get("place_name");
+        trainClassVic = googlePlace.get("vicinity");
+        trainClassLat = Double.parseDouble(googlePlace.get("lat"));
+        trainClassLng = Double.parseDouble(googlePlace.get("lng"));
 
-        latLng = new LatLng(lat, lng);
-        markerOptions.position(latLng);
-        markerOptions.title(placeName + ":" + vicinity);
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//        MainActivity.nearestTrainLatLng = new LatLng(lat, lng);
+
+        Log.d("GetNPlacesData:exe"," Train - latitude value = "+trainClassLat);
+        Log.d("GetNPlacesData:exe"," Train - lngitude value = "+trainClassLng);
+        Log.d("GetNPlacesData:exe"," Train - train station name = "+trainClassSName);
+        Log.d("GetNPlacesData:exe"," Train - train station vicinity = "+trainClassVic);
+
+        MainActivity.trainSName = trainClassSName;
+        MainActivity.trainVicinity = trainClassVic;
+        MainActivity.trainLat = trainClassLat;
+        MainActivity.trainLng = trainClassLng;
+
+//        markerOptions.position(latLng);
+//        markerOptions.title(placeName + ":" + vicinity);
+//        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
 
 //        mMap.addMarker(markerOptions);
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -86,12 +99,6 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
         }*/
-    }
-
-    //REMOVE
-    public LatLng getLatLng(){
-
-        return latLng;
     }
 
 }

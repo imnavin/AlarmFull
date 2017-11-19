@@ -72,13 +72,25 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private int distance;
     double myLat, myLng;
     double destLat, destLng;
-    int durationHours=0, durationMins=0;
+    int durationHours=0, durationMins=0, durationDHours=0, durationDMins=0;
     int readyDurationMins=0;
     GoogleMap mMap;
     int distA_B;
-    int[] durr;
+    int[] durr, durrDestTrain;
     public static String durationToDest="";
     public static String distanceToDest="";
+    public boolean modeOfTransport = false;
+    //Train **************
+//    public static LatLng nearestTrainLatLng;
+    String trainDuration;
+    public static String trainVicinity, trainSName;
+//    LatLng trainLatLngDest, trainLatLngMy;
+    public static double trainLat, trainLng;
+    String toTrainMyDur, toTrainDestDur;
+    String trainDestName, trainDestVicinity;
+    String trainMyName, trainMyVicinity;
+    double trainDestLat, trainDestLng;
+    double trainMyLat, trainMyLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,9 +133,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View v) {
 
-                if (!(hour == 0 && minute == 0 && dest == null)) {
+                //Own Vehicle
+                if (!(hour == 0 && minute == 0 && dest == null) && modeOfTransport) {
 
-                    Log.d("MainActivity:SetAlarm"," Got through 1:YAYY");
+                    Log.d("MainActivity:SetAlarm"," Car - Got through 1:YAYY");
 
                     OtherMethods otherMethods = new OtherMethods();
 
@@ -134,11 +147,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     //Have to get our location
                     myLat = 6.837140;
                     myLng = 79.929397;
+//                    myLat = 6.837140;
+//                    myLng = 79.929397;
 
                     destLat = dest.latitude;
                     destLng = dest.longitude;
 
-                    Log.d("MainActivity:SetAlarm"," Got through 2:YAYY");
+                    Log.d("MainActivity:SetAlarm"," Car - Got through 2:YAYY");
 
                     /*//COMMENTED - fixing duration and dest
                     locationA.setLatitude(myLat);
@@ -161,10 +176,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 distA_B = exe.extractDistance(distanceToDest);
                                                 durr = exe.extractDuration(durationToDest);
 
-                                                Log.d("MainActivity:SetAlarm","Distance = "+distanceToDest);
-                                                Log.d("MainActivity:SetAlarm","Duration = "+durationToDest);
+                                                Log.d("MainActivity:SetAlarm"," Car - Distance = "+distanceToDest);
+                                                Log.d("MainActivity:SetAlarm"," Car - Duration = "+durationToDest);
 
-                                                Log.d("MainActivity:SetAlarm","Got through 3:YAYY");
+                                                Log.d("MainActivity:SetAlarm"," Car - Got through 3:YAYY");
 
                                                 if(durr.length == 1){
                                                     durationMins = durr[0];
@@ -174,10 +189,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                     durationMins = durr[1];
                                                 }
                                                 else {
-                                                    Log.e("MainActivity:SetAlarm","ERROR: Array durr = "+ Arrays.toString(durr));
+                                                    Log.e("MainActivity:SetAlarm"," Car - ERROR: Array durr = "+ Arrays.toString(durr));
                                                 }
 
-                                                Log.d("MainActivity:SetAlarm", "Distance is = "+Integer.toString(distA_B));
+                                                Log.d("MainActivity:SetAlarm", " Car - Distance is = "+Integer.toString(distA_B));
                                                 //String duration = otherMethods.extractDuration(GetDirectionsData.duration);
 //                    String duration="25";
 //                    String[] parts = duration.split(" "); COMMENTED - fixing duration and dest
@@ -212,12 +227,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                                 hour = hour - durationHours;
                                                 minute = minute - durationMins;
 
-                                                Log.i("MainActivity(SetAlarm)", "Hours PASS = "+Integer.toString(hour));
-                                                Log.i("MainActivity(SetAlarm)", "Mins PASS = "+Integer.toString(minute));
+                                                Log.i("MainActivity(SetAlarm)", " Car - Hours PASS = "+Integer.toString(hour));
+                                                Log.i("MainActivity(SetAlarm)", " Car - Mins PASS = "+Integer.toString(minute));
 
                                                 //weatherCondition=false;
                                                 if (weatherCondition) {
-                                                    Log.i("MainActivity(SetAlarm)","Weather data PASS = "+Boolean.toString(weatherCondition));
+                                                    Log.i("MainActivity(SetAlarm)"," Car - Weather data PASS = "+Boolean.toString(weatherCondition));
                                                     distA_B = distA_B * 1;
                                                     minute = minute - distA_B;
                                                     if (minute < 0) {
@@ -263,6 +278,223 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //                    int[] durr = otherMethods.extractDuration(durationToDest);
 
 
+
+                }
+
+                //Train
+                else if (!(hour == 0 && minute == 0 && dest == null) && !modeOfTransport){
+
+                    Log.d("MainActivity:SetAlarm"," Train - Got through 1:(ButtonClick is working)");
+
+                    OtherMethods otherMethods = new OtherMethods();
+
+                    /*//COMMENTED - fixing duration and dest
+                    Location locationA = new Location("Point A");
+                    Location locationB = new Location("Point B");*/
+
+                    //Have to get our location
+                    myLat = 6.837140;
+                    myLng = 79.929397;
+//                    myLat = 6.837140;
+//                    myLng = 79.929397;
+
+                    destLat = dest.latitude;
+                    destLng = dest.longitude;
+
+                    //ADD TIME
+                    hour = MyTimePicker.hoursTP;
+                    minute = MyTimePicker.minsTP;
+
+                    /*//Uncomment
+                    hour = hour - durationHours;
+                    minute = minute - durationMins;*/
+
+                    Log.i("MainActivity(SetAlarm)", " Train - Hours PASS = " + Integer.toString(hour));
+                    Log.i("MainActivity(SetAlarm)", " Train - Mins PASS = " + Integer.toString(minute));
+
+                    Log.d("MainActivity:SetAlarm"," Train - Got through 2:(Destination LatLng and Time taken)");
+
+                    findNearestStation(myLat,myLng);
+
+                    /*//Uncomment
+                    findNearestStation(destLat,destLng);
+                    trainDestLat = trainLat;
+                    trainDestLng = trainLng;
+                    trainDestName = trainSName;
+                    trainDestVicinity = trainVicinity;*/
+
+                    /*//COMMENTED - fixing duration and dest
+                    locationA.setLatitude(myLat);
+                    locationA.setLongitude(myLng);
+
+                    locationB.setLatitude(destLat);
+                    locationB.setLongitude(destLng);
+
+                    float distanceA_B = locationA.distanceTo(locationB);
+
+                    int distA_B = (int) distanceA_B;*/
+
+//                    distanceFromAtoB(myLat,myLng,destLat,destLng);
+
+                    final Handler handler = new Handler();
+
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    OtherMethods exe = new OtherMethods();
+
+                                    trainMyLat = trainLat;
+                                    trainMyLng = trainLng;
+                                    trainMyName = trainSName;
+                                    trainMyVicinity = trainVicinity;
+
+                                    Log.d("MainActivity:SetAlarm", " >> Train - lat MY = " + trainMyLat);//DONE
+                                    Log.d("MainActivity:SetAlarm", " >> Train - lng MY = " + trainMyLng);//DONE
+                                    Log.d("MainActivity:SetAlarm", " >> Train - trainName MY = " + trainMyName);//DONE
+                                    Log.d("MainActivity:SetAlarm", " >> Train - trainVic MY = " + trainMyVicinity);//DONE
+
+                                    Log.d("MainActivity:SetAlarm", " >> Train - Successfully captured MyTrain");//DONE
+
+                                    trainMyName = exe.extractTrainStationName(trainMyName);
+
+                                    //Travel duration for my train station
+                                    distanceFromAtoB(myLat,myLng,trainMyLat,trainMyLng);
+
+                                    trainLat = 0;
+                                    trainLng = 0;
+                                    trainSName = "";
+                                    trainVicinity = "";
+
+                                    findNearestStation(destLat,destLng);
+
+                                }
+                            },2500);
+
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+
+                                    OtherMethods exe = new OtherMethods();
+
+                                    trainDestLat = trainLat;
+                                    trainDestLng = trainLng;
+                                    trainDestName = trainSName;
+                                    trainDestVicinity = trainVicinity;
+
+                                    Log.d("MainActivity:SetAlarm"," >> Train - lat DEST = "+trainDestLat);//DONE
+                                    Log.d("MainActivity:SetAlarm"," >> Train - lng DEST = "+trainDestLng);//DONE
+                                    Log.d("MainActivity:SetAlarm"," >> Train - trainName DEST = "+trainDestName);//DONE
+                                    Log.d("MainActivity:SetAlarm"," >> Train - trainVic DEST = "+trainDestVicinity);//DONE
+
+                                    Log.d("MainActivity:SetAlarm", " >> Train - Successfully captured DestTrain");//DONE
+
+                                    toTrainMyDur = durationToDest;
+                                    durationToDest = "";
+
+                                    durr = exe.extractDuration(toTrainMyDur);
+
+                                    if(durr.length == 1){
+                                        durationMins = durr[0];
+                                    }
+                                    else if (durr.length == 2){
+                                        durationHours = durr[0];
+                                        durationMins = durr[1];
+                                    }
+                                    else {
+                                        Log.e("MainActivity:SetAlarm"," >> Train - ERROR: Array durr MY = "+ Arrays.toString(durr));
+                                    }
+
+                                    Log.i("MainActivity(SetAlarm)", " >> Train - durationHours PASS MY = "+Integer.toString(durationHours));
+                                    Log.i("MainActivity(SetAlarm)", " >> Train - durationMins PASS MY = "+Integer.toString(durationMins));
+
+                                    //Substracting the time it takes for me to go to MY station
+                                    hour = hour - durationHours;
+                                    minute = minute - durationMins;
+
+                                    Log.i("MainActivity(SetAlarm)", " >> Train - Hours PASS MY = "+Integer.toString(hour));
+                                    Log.i("MainActivity(SetAlarm)", " >> Train - Mins PASS MY = "+Integer.toString(minute));
+
+                                    distanceFromAtoB(destLat,destLng,trainDestLat,trainDestLng);
+
+                                }
+                            },5000);//5000
+
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+
+                            OtherMethods exe = new OtherMethods();
+
+                            toTrainDestDur = durationToDest;
+                            durationToDest = "";
+
+                            durrDestTrain = exe.extractDuration(toTrainDestDur);
+
+                            if(durrDestTrain.length == 1){
+                                durationDMins = durrDestTrain[0];
+                            }
+                            else if (durrDestTrain.length == 2){
+                                durationDHours = durrDestTrain[0];
+                                durationDMins = durrDestTrain[1];
+                            }
+                            else {
+                                Log.e("MainActivity:SetAlarm"," >> Train - ERROR: Array durr DEST = "+ Arrays.toString(durrDestTrain));
+                            }
+
+                                    Log.i("MainActivity(SetAlarm)", " >> Train - durationHours PASS DEST = "+Integer.toString(durationDHours));
+                                    Log.i("MainActivity(SetAlarm)", " >> Train - durationMins PASS DEST = "+Integer.toString(durationDMins));
+
+                            //Substracting the time it takes for me to go to MY station
+                            hour = hour - durationDHours;
+                            minute = minute - durationDMins;
+
+                            Log.i("MainActivity(SetAlarm)", " >> Train - Hours PASS DEST = "+Integer.toString(hour));
+                            Log.i("MainActivity(SetAlarm)", " >> Train - Mins PASS DEST = "+Integer.toString(minute));
+
+                            /*//Uncomment
+                            distA_B = exe.extractDistance(distanceToDest);
+                            durr = exe.extractDuration(durationToDest);*/
+
+//                            Log.d("MainActivity:SetAlarm"," Train - Distance = "+distanceToDest);
+//                            Log.d("MainActivity:SetAlarm"," Train - Duration = "+durationToDest);
+
+                            Log.d("MainActivity:SetAlarm", " >> Train - Got through 3:(Successfully substracted time)");
+
+                                    calendar.set(Calendar.HOUR_OF_DAY, hour);//set calendar instance with hours and minutes on the time picker
+                                    calendar.set(Calendar.MINUTE, minute);
+
+                                    String hour_string = String.valueOf(hour);
+                                    String minute_string = String.valueOf(minute);
+
+                                    if (hour > 12) {
+
+                                        hour_string = String.valueOf(hour - 12);
+                                        am_pm = "PM";
+                                    }
+
+                                    if (minute < 10) {
+
+                                        minute_string = "0" + String.valueOf(minute);
+
+                                    }
+
+                                    set_alarm_text(hour_string + ":" + minute_string + am_pm);//changes the text in the update text box
+
+                                    my_intent.putExtra("extra", "alarm on");//tells the clock that the alarm on button is pressed, putting extra string to my_intent
+                                    my_intent.putExtra("alarm tone", alarm_tracks);//tell the app that you want a certain value from the spinner
+
+                                    Log.e("The alarm id is", String.valueOf(alarm_tracks));
+
+                                    pending_intent = PendingIntent.getBroadcast(MainActivity.this, 0,
+                                            my_intent, PendingIntent.FLAG_UPDATE_CURRENT);//Create a pending intent
+
+                                    alarm_manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pending_intent);
+                                }
+                            }, 7500);//5000
+
+//                    int distA_B = otherMethods.extractDistance(GetDirectionsData.distanceToDest);
+//                    int[] durr = otherMethods.extractDuration(durationToDest);
 
                 }
 
@@ -315,15 +547,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
-    public LatLng findNearestStation(double lat, double lng){
-
-        LatLng nearestTrainLatLng;
+    public void findNearestStation(double lat, double lng){
 
         OtherMethods otherMethods = new OtherMethods();
         String keyType = "train_station";
         String trainUrl = otherMethods.getNearbyTrainUrl(lat, lng, keyType);
 
-        Log.d("MainAct(findStation)", "TRAIN URL = "+trainUrl);
+        Log.d("MainAct(findStation)", "Train URL = "+trainUrl);
 
         Object dataTransfer[] = new Object[2];
         dataTransfer[0] = mMap;
@@ -331,11 +561,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
         getNearbyPlacesData.execute(dataTransfer);
-        nearestTrainLatLng = getNearbyPlacesData.getLatLng(); // ADD CODE - GETLATLNG FROM getNearbyPlacesData
+//        nearestTrainLatLng = getNearbyPlacesData.getLatLng(); // ADD CODE - GETLATLNG FROM getNearbyPlacesData
 
-        Log.d("MainAct(findStation)","Train LatLng = "+nearestTrainLatLng.toString());
+//        Log.d("MainAct(findStation)","Train LatLng = "+nearestTrainLatLng.toString());
 
-        return nearestTrainLatLng;
+//        return nearestTrainLatLng;
     }
 
     public void distanceFromAtoB(double A_lat, double A_lng, double B_lat, double B_lng){

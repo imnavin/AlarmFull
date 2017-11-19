@@ -81,4 +81,10 @@ public class OtherMethods {
         return trainDur;
     }
 
+    public String extractTrainStationName(String trainStationName){
+        String[] parts = trainStationName.split(" ");
+        String trainName = parts[0];
+        return trainName;
+    }
+
 }
